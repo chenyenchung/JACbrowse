@@ -7,7 +7,7 @@ library(tidyr)
 
 # Set comment.char because the header of the raw data strats with #
 # (Default comment char)
-hmc_raw <- read.table(file = "./GSE79561_RNAseq_FPKM_ES_to_MN.txt", header = T,
+hmc_raw <- read.table(file = "./dataset/GSE79561_RNAseq_FPKM_ES_to_MN.txt", header = T,
                   stringsAsFactors = F, comment.char = "")
 colnames(hmc_raw)[1] <- "id"
 hmc_raw$symid <- paste0(hmc_raw$symbol, " (", hmc_raw$id, ")")

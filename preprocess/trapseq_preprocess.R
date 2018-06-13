@@ -1,5 +1,5 @@
 # Pre-processing
-trapseq <- read.csv("GSE93412_gene_counts.csv", header = TRUE, stringsAsFactors = FALSE)
+trapseq <- read.csv("./dataset/GSE93412_gene_counts.csv", header = TRUE, stringsAsFactors = FALSE)
 # Normalize to input
 normalized <- trapseq[, c(5:10)]/trapseq[, c(11:16)]
 

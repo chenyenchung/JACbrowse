@@ -12,8 +12,8 @@ library(tidyr)
 library(dplyr)
 library(cowplot)
 
-source("trapseq_preprocess.R")
-source("hmc_preprocess.R")
+source("./preprocess/trapseq_preprocess.R")
+source("./preprocess/hmc_preprocess.R")
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
