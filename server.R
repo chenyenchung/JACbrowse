@@ -83,6 +83,7 @@ shinyServer(function(input, output) {
   # Dynamic input textbox
   output$genetext <- renderUI({
     # The number of text input is defined by the selection slider
+    # https://stackoverflow.com/questions/19130455/create-dynamic-number-of-input-elements-with-r-shiny
     num_text <- as.integer(input$hmc_nofgene)
     lapply(seq(num_text), function(x) {
       div(style = "display:inline-block",
@@ -113,7 +114,7 @@ shinyServer(function(input, output) {
     }
     
     # Plot
-    ggplot(disp_df, aes(x = variable, y = value, color = symbol, group = symbol)) +
+    ggplot(disp_df, aes(x = variable, y = value, color = symid, group = symid)) +
       geom_point() + geom_line() +
       labs(x = "Day after differentiaion", y = input$hmc_normalization, color = "Gene") +
       theme(text = element_text(size = 20),
@@ -130,7 +131,7 @@ shinyServer(function(input, output) {
     disp_df <- filter(hmc_zl, tolower(symbol) %in% name_filter)
     
     # Plot
-    ggplot(disp_df, aes(x = variable, y = symbol, fill = value)) +
+    ggplot(disp_df, aes(x = variable, y = symid, fill = value)) +
       geom_tile() +
       scale_fill_gradientn(colors = c("blue", "white", "red")) +
       labs(x = "Day after differentiaion", y = "", fill = "Z-score") +
