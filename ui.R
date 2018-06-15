@@ -28,7 +28,7 @@ shinyUI(fluidPage(
                            downloadButton(outputId = "trap_download", label = "Download Graph")
                          ),
                          mainPanel(
-                           includeMarkdown("trap_info.md"),
+                           includeMarkdown("./intro/trap_info.md"),
                            tabsetPanel(id = "trap_tabplot",
                              tabPanel(title = "Raw Count Per Million (CPM)",
                                       plotOutput("trap_rawPlot")),
@@ -41,24 +41,54 @@ shinyUI(fluidPage(
              tabPanel("In vitro HMC Dev Query",
                       sidebarLayout(
                         sidebarPanel(
-                          sliderInput(inputId = "hmc_nofgene",min = 1, max = 12,
-                                      value = 1, step = 1,
-                                      label = "Number of genes to compare"),
+                          # sliderInput(inputId = "hmc_nofgene",min = 1, max = 12,
+                          #             value = 1, step = 1,
+                          #             label = "Number of genes to compare"),
                           selectInput(inputId = "hmc_normalization", label = "Normalization",
                                       choices = c("FPKM", "Z-score"), selected = "FPKM"),
-                          bootstrapPage(uiOutput("genetext")),
+                          textInput(inputId = "hmcbatchlist",
+                                    label = "List of gene name to query",
+                                    placeholder = '"Mnx1", "Chat", "Slc18a3"'),
+                          # bootstrapPage(uiOutput("hmc_genetext")),
                           actionButton(inputId = "hmc_go", label = "Search"),
                           selectInput(inputId = "hmc_filetype", choices = c("pdf","png"), selected = "pdf",
                                       label = "File type for download"),
                           downloadButton(outputId = "hmc_download", label = "Download Graph")
                         ),
                         mainPanel(
-                          includeMarkdown("hmc_info.md"),
+                          includeMarkdown("./intro/hmc_info.md"),
                           tabsetPanel(id = "hmc_plot",
                                       tabPanel("Line Plot",
                                                plotOutput("hmc_linePlot")),
                                       tabPanel("Heatmap",
                                                plotOutput("hmc_hmPlot"))
+                                      
+                          )
+                        )
+                      )
+             ),
+             tabPanel("hSOD1-A4V Query",
+                      sidebarLayout(
+                        sidebarPanel(
+                          # sliderInput(inputId = "a4v_nofgene",min = 1, max = 12,
+                          #             value = 1, step = 1,
+                          #             label = "Number of genes to compare"),
+                          # bootstrapPage(uiOutput("a4v_genetext")),
+                          textInput(inputId = "a4vbatchlist",
+                                    label = "List of gene name to query",
+                                    placeholder = '"Mnx1", "Chat", "Slc18a3"'),
+                          actionButton(inputId = "a4v_go", label = "Search"),
+                          selectInput(inputId = "a4v_filetype", choices = c("pdf","png"), selected = "pdf",
+                                      label = "File type for download"),
+                          downloadButton(outputId = "a4v_download", label = "Download Graph")
+                        ),
+                        mainPanel(
+                          includeMarkdown("./intro/a4v_info.md"),
+                          tabsetPanel(id = "a4v_plot",
+                                      tabPanel("Bar Plot",
+                                               plotOutput("a4v_barPlot")),
+                                      tabPanel("Heatmap",
+                                               plotOutput("a4v_hmPlot"))
                                       
                           )
                         )

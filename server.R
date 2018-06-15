@@ -6,14 +6,16 @@
 # 
 #    http://shiny.rstudio.com/
 #
+options(repos = BiocInstaller::biocinstallRepos())
+
 library(shiny)
 library(ggplot2)
 library(tidyr)
 library(dplyr)
 library(cowplot)
-
 source("./preprocess/trapseq_preprocess.R")
 source("./preprocess/hmc_preprocess.R")
+source("./preprocess/a4v_preprocess.R")
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
@@ -81,25 +83,40 @@ shinyServer(function(input, output) {
   # HMC RNA-seq
   
   # Dynamic input textbox
-  output$genetext <- renderUI({
-    # The number of text input is defined by the selection slider
-    # https://stackoverflow.com/questions/19130455/create-dynamic-number-of-input-elements-with-r-shiny
-    num_text <- as.integer(input$hmc_nofgene)
-    lapply(seq(num_text), function(x) {
-      div(style = "display:inline-block",
-          textInput(inputId = paste0("gene",x),
-                label = "Gene", width = 180))
-    })
-  })
+  # output$hmc_genetext <- renderUI({
+  #   # The number of text input is defined by the selection slider
+  #   # https://stackoverflow.com/questions/19130455/create-dynamic-number-of-input-elements-with-r-shiny
+  #   num_text <- as.integer(input$hmc_nofgene)
+  #   lapply(seq(num_text), function(x) {
+  #     div(style = "display:inline-block",
+  #         textInput(inputId = paste0("gene",x),
+  #               label = "Gene", width = 180))
+  #   })
+  # })
   
   # Dynamically retrieve the number of genes to check
+  ###### Remove in next update ########
+  # hmc_name <- eventReactive(input$hmc_go, {
+  #   if (nchar(input$hmcbatchlist) < 1) {
+  #     queryname <- vector(length = input$hmc_nofgene,
+  #                         mode = "character")
+  #     for (i in seq(input$hmc_nofgene)) {
+  #       queryname[i] <- input[[paste0("gene", i)]]
+  #     }
+  #     return(queryname)
+  #   } else {
+  #     list <- input$hmcbatchlist
+  #     list <- gsub(pattern = "[^A-Za-z0-9,]*", replacement = "", x = list)
+  #     list <- unlist(strsplit(x = list, split = ","))
+  #     return(list)
+  #   }
+  # })
+  
   hmc_name <- eventReactive(input$hmc_go, {
-    queryname <- vector(length = input$hmc_nofgene,
-                        mode = "character")
-    for (i in seq(input$hmc_nofgene)) {
-      queryname[i] <- input[[paste0("gene", i)]]
-    }
-    return(queryname)
+      list <- input$hmcbatchlist
+      list <- gsub(pattern = "[^A-Za-z0-9,]*", replacement = "", x = list)
+      list <- unlist(strsplit(x = list, split = ","))
+      return(list)
   })
   
   # Line Plot
@@ -141,7 +158,7 @@ shinyServer(function(input, output) {
             plot.title = element_text(size = 20))
   }
   
-  # Defining output for TRAPseq
+  # Defining output for HMC RNA-seq
   output$hmc_linePlot <- renderPlot({
     plot(hmc_lineplot())
   })
@@ -164,5 +181,104 @@ shinyServer(function(input, output) {
       }
     }
   )
+  
+  # hSOD1-A4V RNA-seq
+
+  ####### Remove in next update ########
+  # Dynamic input textbox
+  # output$a4v_genetext <- renderUI({
+  # # The number of text input is defined by the selection slider
+  # # https://stackoverflow.com/questions/19130455/create-dynamic-number-of-input-elements-with-r-shiny
+  # num_text <- as.integer(input$a4v_nofgene)
+  # lapply(seq(num_text), function(x) {
+  #   div(style = "display:inline-block",
+  #       textInput(inputId = paste0("gene",x),
+  #                 label = "Gene", width = 180))
+  #   })
+  # })
+  
+  # Dynamically retrieve the number of genes to check
+  # a4v_name <- eventReactive(input$a4v_go, {
+  #   if (is.null(input$a4vbatchlist)) {
+  #     queryname <- vector(length = input$a4v_nofgene,
+  #                         mode = "character")
+  #     for (i in seq(input$a4v_nofgene)) {
+  #       queryname[i] <- input[[paste0("gene", i)]]
+  #     }
+  #     return(queryname)
+  #   } else {
+  #     list <- input$a4vbatchlist
+  #     list <- gsub(pattern = "[^A-Za-z0-9,]*", replacement = "", x = list)
+  #     list <- unlist(strsplit(x = list, split = ","))
+  #     return(list)
+  #   }
+  # })
+  
+  a4v_name <- eventReactive(input$a4v_go, {
+      list <- input$a4vbatchlist
+      list <- gsub(pattern = "[^A-Za-z0-9,]*", replacement = "", x = list)
+      list <- unlist(strsplit(x = list, split = ","))
+      return(list)
+  })
+  
+  # Line Plot
+  a4v_barplot <- function() {
+    # Convert everything to lower case to ignore case
+    name_filter <- sapply(a4v_name(), function(x) tolower(x))
+    # Filter out genes that are asked
+    disp_df <- filter(a4v_l, tolower(hgnc_symbol) %in% name_filter)
+    
+    # Plot
+    ggplot(disp_df, aes(x = hgnc_symbol, y = count, fill = sample, group = sample)) +
+      geom_bar(stat = "identity", position = position_dodge()) +
+      labs(x = "Sample Type", y = "Counts", fill = "Sample Type") +
+      theme(text = element_text(size = 20),
+            axis.text = element_text(size = 15),
+            axis.title = element_text(size = 15),
+            plot.title = element_text(size = 20))
+  }
+  
+  # Heatmap
+  a4v_hm <- function() {
+    # Convert everything to lower case to ignore case
+    name_filter <- sapply(a4v_name(), function(x) tolower(x))
+    # Filter out genes that are asked
+    disp_df <- filter(a4v_l, tolower(hgnc_symbol) %in% name_filter)
+    
+    # Plot
+    ggplot(disp_df, aes(x = sample, y = hgnc_symbol, fill = count)) +
+      geom_tile() +
+      scale_fill_gradientn(colors = c("blue", "white", "red")) +
+      labs(x = "", y = "", fill = "Count Number") +
+      theme(text = element_text(size = 20),
+            axis.text = element_text(size = 15),
+            axis.title = element_text(size = 15),
+            plot.title = element_text(size = 20))
+  }
+  
+  # Defining output for HMC RNA-seq
+  output$a4v_barPlot <- renderPlot({
+    plot(a4v_barplot())
+  })
+  
+  output$a4v_hmPlot <- renderPlot({
+    plot(a4v_hm())
+  })
+  
+  # Download Button
+  output$a4v_download <- downloadHandler(
+    filename = function() {paste0("SOD1_A4V_hiPS.",input$hmc_filetype)},
+    content = function(file) {
+      # Save the current active tab
+      if(input$a4v_plot == "Bar Plot") {
+        ggsave(file, plot = hmc_lineplot(),
+               width = 297, height = 210, units = "mm")
+      } else {
+        ggsave(file, plot = hmc_hm(),
+               width = 297, height = 210, units = "mm")
+      }
+    }
+  )
+  
   ### End of server chunk
 })
