@@ -1,0 +1,12 @@
+name: JACbrowse
+title: JACbrowse
+username:
+account: yc-chen
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 360138
+bundleId: 1431057
+url: https://yc-chen.shinyapps.io/JACbrowse/
+when: 1529057042.49773
+asMultiple: FALSE
+asStatic: FALSE
